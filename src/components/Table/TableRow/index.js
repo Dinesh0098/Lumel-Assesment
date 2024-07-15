@@ -62,6 +62,11 @@ export default function CustomTableRow({ row, mutateParent }) {
             placeholder="Add value"
             onChange={onInputValueChange}
             value={inputValue}
+            sx={{
+              "& .MuiInputBase-input": {
+                fontSize: "12px",
+              },
+            }}
           />
         </TableCell>
         <TableCell align="center">

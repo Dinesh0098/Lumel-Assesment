@@ -2,7 +2,7 @@ export const ROWS = [
   {
     id: "electronics",
     label: "Electronics",
-    value: 0,
+    value: 1400,
     children: [
       {
         id: "phones",
@@ -19,7 +19,7 @@ export const ROWS = [
   {
     id: "furniture",
     label: "Furniture",
-    value: 0,
+    value: 1000,
     children: [
       {
         id: "tables",
