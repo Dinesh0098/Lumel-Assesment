@@ -1,71 +1,62 @@
-import { Button, TableCell, TableRow, TextField } from "@mui/material";
-import { useState } from "react";
+import { TableCell, TableRow, TextField } from "@mui/material";
+import { useState, useMemo } from "react";
 import CustomButton from "../../Button";
 
 const ADD_VALUE_ACTION = "addValue";
 
 export default function CustomTableRow({ row, mutateParent }) {
   const [currentRowData, setCurrentRowData] = useState({ ...row });
-  const [inputValue, setInputValue] = useState();
+  const [inputValue, setInputValue] = useState("");
 
-  const { label, value, children, gain } = currentRowData;
-  const rowChildren = children;
+  // Destructure properties from currentRowData using useMemo for memoization
+  const { label, value, children, gain } = useMemo(
+    () => currentRowData,
+    [currentRowData]
+  );
 
   const onInputValueChange = (event) => {
-    const value = event.target.value;
-
-    // Remove non-numeric characters, spaces, and ensure no leading zeros
-    const sanitizedValue = value.replace(/[^0-9]/g, "").replace(/^0+/, "");
-
-    // Set the sanitized value.
-    setInputValue(sanitizedValue ?? 0);
+    // Remove non-numeric characters and leading zeros
+    const sanitizedValue = event.target.value
+      .replace(/[^0-9]/g, "")
+      .replace(/^0+/, "");
+    setInputValue(sanitizedValue);
   };
 
+  // Calculate the value change based on action and update the state
   const calculateValueChange = (action) => {
-    let addingValue = 0;
+    const parsedValue = Number(value ?? 0);
+    const parsedInputValue = Number(inputValue ?? 0);
+    let newValue = 0;
 
     if (action === ADD_VALUE_ACTION) {
-      addingValue = Number(value ?? 0) + Number(inputValue);
-      mutateParent?.(value);
+      // Add input value to the current value
+      newValue = parsedValue + parsedInputValue;
+      mutateParent?.(parsedInputValue); // Update parent with the input value
     } else {
-      const percentage = (value * inputValue) / 100;
-      addingValue = Number(value ?? 0) + Number(percentage);
-      mutateParent?.(percentage);
+      // Calculate percentage change
+      const percentage = (parsedValue * parsedInputValue) / 100;
+      newValue = parsedValue + percentage;
+      mutateParent?.(percentage); // Update parent with the percentage value
     }
 
-    const gain = ((addingValue - row.value) / row.value) * 100;
-
-    // Spreading data to remove the object reference
-    setCurrentRowData({
-      ...{
-        ...currentRowData,
-        value: addingValue,
-        gain,
-      },
-    });
+    // Calculate gain and update the current row data
+    const newGain = ((newValue - row.value) / row.value) * 100;
+    setCurrentRowData({ ...currentRowData, value: newValue, gain: newGain });
   };
 
+  // Handle changes from child rows
   const onChildValueChange = (childValue) => {
-    const addingValue = Number(value) + Number(childValue);
-
-    const gain = ((addingValue - row.value) / row.value) * 100;
-
-    // Spreading data to remove the object reference
-    setCurrentRowData({
-      ...{
-        ...currentRowData,
-        value: addingValue,
-        gain,
-      },
-    });
+    const newValue = Number(value) + Number(childValue);
+    const newGain = ((newValue - row.value) / row.value) * 100;
+    setCurrentRowData({ ...currentRowData, value: newValue, gain: newGain });
   };
 
   return (
     <>
       <TableRow>
-        <TableCell>{label}</TableCell>
-        <TableCell>{value?.toFixed(2)}</TableCell>
-        <TableCell>
+        <TableCell align="center">{label}</TableCell>
+        <TableCell align="center">{value?.toFixed(2)}</TableCell>
+        <TableCell align="center">
           <TextField
             size="small"
             placeholder="Add value"
@@ -73,25 +64,26 @@ export default function CustomTableRow({ row, mutateParent }) {
             value={inputValue}
           />
         </TableCell>
-        <TableCell>
+        <TableCell align="center">
           <CustomButton
             onClick={() => calculateValueChange()}
-            title={"Allocate %"}
+            title="Allocate %"
             disabled={!inputValue}
-          ></CustomButton>
+          />
         </TableCell>
-        <TableCell>
+        <TableCell align="center">
           <CustomButton
             onClick={() => calculateValueChange(ADD_VALUE_ACTION)}
-            title={"Allocate Val"}
+            title="Allocate Val"
             disabled={!inputValue}
-          ></CustomButton>
+          />
         </TableCell>
-        <TableCell>{gain?.toFixed(2) ?? "-"}</TableCell>
+        <TableCell>{gain ? `${gain?.toFixed(2)}%` : "0%"}</TableCell>
       </TableRow>
-      {rowChildren?.length
-        ? rowChildren.map((childRow) => (
+      {children?.length
+        ? children.map((childRow) => (
             <CustomTableRow
+              key={childRow.label} // Ensure a unique key for each child row
               row={{ ...childRow, label: `-- ${childRow.label}` }}
               mutateParent={onChildValueChange}
             />

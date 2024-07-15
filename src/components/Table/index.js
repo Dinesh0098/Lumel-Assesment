@@ -1,29 +1,27 @@
-import React from "react";
 import {
+  Paper,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
   TableHead,
-  Paper,
-  TableRow,
+  TableRow
 } from "@mui/material";
+import React from "react";
+import HeaderCell from "../HeaderCell";
 import CustomTableRow from "./TableRow";
 
 const DataTable = ({ data }) => {
-  console.log("data", data);
-
   return (
     <TableContainer component={Paper}>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Label</TableCell>
-            <TableCell>Value</TableCell>
-            <TableCell>Input</TableCell>
-            <TableCell>Allocate %</TableCell>
-            <TableCell>Allocate Val</TableCell>
-            <TableCell>Variance %</TableCell>
+            <HeaderCell title="Label" />
+            <HeaderCell title="Value" />
+            <HeaderCell title="Input" />
+            <HeaderCell title="Allocate %" />
+            <HeaderCell title="Allocate Val" />
+            <HeaderCell title="Variance %" />
           </TableRow>
         </TableHead>
         <TableBody>
