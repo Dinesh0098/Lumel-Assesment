@@ -1,22 +1,53 @@
-import logo from './logo.svg';
-import './App.css';
+import DataTable from "./components/Table";
+
+const data = {
+  rows: [
+    {
+      id: "electronics",
+      label: "Electronics",
+      value: 0,
+      children: [
+        {
+          id: "phones",
+          label: "Phones",
+          value: 800,
+        },
+        {
+          id: "laptops",
+          label: "Laptops",
+          value: 700,
+        },
+      ],
+    },
+    {
+      id: "furniture",
+      label: "Furniture",
+      value: 0,
+      children: [
+        {
+          id: "tables",
+          label: "Tables",
+          value: 300,
+        },
+        {
+          id: "chairs",
+          label: "Chairs",
+          value: 700,
+        },
+      ],
+    },
+  ],
+};
+
+data.rows.forEach((row) => {
+  row.value = row.children.reduce((sum, child) => sum + child.value, 0);
+});
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <DataTable data={data.rows} />
       </header>
     </div>
   );
