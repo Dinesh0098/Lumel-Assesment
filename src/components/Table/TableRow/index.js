@@ -1,9 +1,10 @@
 import { Button, TableCell, TableRow, TextField } from "@mui/material";
 import { useState } from "react";
+import CustomButton from "../../Button";
 
 const ADD_VALUE_ACTION = "addValue";
 
-export default function CustomTableRow({ row }) {
+export default function CustomTableRow({ row, mutateParent }) {
   const [currentRowData, setCurrentRowData] = useState({ ...row });
   const [inputValue, setInputValue] = useState();
 
@@ -25,10 +26,27 @@ export default function CustomTableRow({ row }) {
 
     if (action === ADD_VALUE_ACTION) {
       addingValue = Number(value ?? 0) + Number(inputValue);
+      mutateParent?.(value);
     } else {
       const percentage = (value * inputValue) / 100;
       addingValue = Number(value ?? 0) + Number(percentage);
+      mutateParent?.(percentage);
     }
+
+    const gain = ((addingValue - row.value) / row.value) * 100;
+
+    // Spreading data to remove the object reference
+    setCurrentRowData({
+      ...{
+        ...currentRowData,
+        value: addingValue,
+        gain,
+      },
+    });
+  };
+
+  const onChildValueChange = (childValue) => {
+    const addingValue = Number(value) + Number(childValue);
 
     const gain = ((addingValue - row.value) / row.value) * 100;
 
@@ -56,22 +74,18 @@ export default function CustomTableRow({ row }) {
           />
         </TableCell>
         <TableCell>
-          <Button
-            variant="outlined"
-            size="small"
+          <CustomButton
             onClick={() => calculateValueChange()}
-          >
-            Allocate %
-          </Button>
+            title={"Allocate %"}
+            disabled={!inputValue}
+          ></CustomButton>
         </TableCell>
         <TableCell>
-          <Button
-            variant="outlined"
-            size="small"
+          <CustomButton
             onClick={() => calculateValueChange(ADD_VALUE_ACTION)}
-          >
-            Allocate Val
-          </Button>
+            title={"Allocate Val"}
+            disabled={!inputValue}
+          ></CustomButton>
         </TableCell>
         <TableCell>{gain?.toFixed(2) ?? "-"}</TableCell>
       </TableRow>
@@ -79,6 +93,7 @@ export default function CustomTableRow({ row }) {
         ? rowChildren.map((childRow) => (
             <CustomTableRow
               row={{ ...childRow, label: `-- ${childRow.label}` }}
+              mutateParent={onChildValueChange}
             />
           ))
         : null}
