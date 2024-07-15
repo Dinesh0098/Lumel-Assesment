@@ -83,7 +83,7 @@ export default function CustomTableRow({ row, mutateParent }) {
             disabled={!inputValue}
           />
         </TableCell>
-        <TableCell>{gain ? `${gain?.toFixed(2)}%` : "0%"}</TableCell>
+        <TableCell align="center">{gain ? `${gain?.toFixed(2)}%` : "0%"}</TableCell>
       </TableRow>
       {children?.length
         ? children.map((childRow) => (
